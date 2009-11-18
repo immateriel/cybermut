@@ -1,0 +1,43 @@
+Basé sur le gem paypal et sur le code de Yann KLIS http://groups.google.com/group/railsfrance/msg/de3ce6d5c5a44fbd
+
+Dans environment.rb:
+
+Cybermut::Confirmation.action_url = "https://ssl.paiement.cic-banques.fr/test/paiement.cgi"
+Cybermut::Confirmation.hmac_sha1_key = "SHA1_KEY"
+Cybermut::Confirmation.hmac_sha1_pass = "SHA1_PASS"
+
+Dans la vue:
+cybermut_setup(no_commande, montant, tpe, options)
+
+Exemple:
+<%=  cybermut_form_tag %>
+<%= cybermut_setup("order10", 100, "123456",'societe'=>"nomsociete", 'url_retour_ok'=>"http://site/paiement_ok", 'url_retour_err'=>"http://site/paiement_erreur") %>
+<%= submit_tag "Payer maintenant"%>
+</form>
+
+La validation:
+
+  def validate_cybermut_order
+    if request.raw_post
+      confirmation=Cybermut::Confirmation.new(request.raw_post)
+      if Order.exists?(confirmation.reference)
+        @order=Order.find(confirmation.reference)
+        if confirmation.acknowledge
+          if @order.total == confirmation.montant_euros
+            @order.validation
+            logger.info "CYBERMUT: order #{@order.id} is OK"     
+          else
+            logger.info "CYBERMUT: order #{@order.id} FAILS with data problem"
+          end
+        else
+          logger.info "CYBERMUT: order #{@order.id} FAILS with validation" 
+        end
+      else
+        logger.info "CYBERMUT: order #{confirmation.reference} FAILS not found"         
+      end
+    end
+    render :text=>confirmation.response
+  end
+
+Limitations :
+Pas de support d'autre monnaie que l'euro
