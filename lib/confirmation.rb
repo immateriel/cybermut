@@ -95,7 +95,12 @@ module Cybermut
         if @mac.downcase == Cybermut::Helpers.hmac(@data)
           @result = code_retour + retour_plus
           @receipt = "OK"
-          return true
+
+          if code_retour == "Annulation"
+            return false
+          else
+            return true
+          end
         else
           @result  = 'None'
           @receipt = "Document Falsifie"
