@@ -91,7 +91,8 @@ module Cybermut
 
       
         # must be code_retour=="paiement"
-        if code_retour!="Annulation" and @mac.downcase == Cybermut::Helpers.hmac(@data)
+        # code_retour!="Annulation" and 
+        if @mac.downcase == Cybermut::Helpers.hmac(@data)
           @result = code_retour + retour_plus
           @receipt = "OK"
           return true
