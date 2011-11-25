@@ -74,7 +74,7 @@ module Cybermut
       params['retourPLUS']
     end
     
-    def acknowledge
+    def acknowledge(key=Cybermut::Confirmation.hmac_sha1_key,pass=Cybermut::Confirmation.hmac_sha1_pass)
         @mac = params["MAC"]
  
         @data  = "#{retour_plus}"
@@ -92,7 +92,7 @@ module Cybermut
       
         # must be code_retour=="paiement"
         # code_retour!="Annulation" and 
-        if @mac.downcase == Cybermut::Helpers.hmac(@data)
+        if @mac.downcase == Cybermut::Helpers.hmac(@data,key,pass)
           @result = code_retour + retour_plus
           @receipt = "OK"
 

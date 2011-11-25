@@ -9,7 +9,7 @@ module Cybermut
     end
  
  
-    def cybermut_setup(reference,montant,tpe, options={})
+    def cybermut_setup(reference,montant,tpe, options={},key=Cybermut::Confirmation.hmac_sha1_key,pass=Cybermut::Confirmation.hmac_sha1_pass)
         misses = (options.keys - valid_cybermut_setup_options)
         raise ArgumentError, "Unknown option #{misses.inspect}" if not misses.empty?
         
@@ -34,7 +34,7 @@ module Cybermut
 
         data = params['TPE'] + "*" + params['date'] + "*" + params['montant'] + "*" + params['reference'] + "*" + params['texte_libre'] + "*" + params['version'] + "*" + params['lgue'] + "*" + params['societe'] + "*"
 
-        params['MAC'] = Cybermut::Helpers.hmac(data)
+        params['MAC'] = Cybermut::Helpers.hmac(data,key,pass)
 
 
         button=[]
@@ -47,10 +47,8 @@ module Cybermut
     
  
     
-     def self.hmac(data)
+     def self.hmac(data,key,pass)
        # clé extraite grâce à extract2HmacSha1.html fourni par le Crédit Mutuel 
-       key=Cybermut::Confirmation.hmac_sha1_key       
-       pass = Cybermut::Confirmation.hmac_sha1_pass
 
        k1 = [Digest::SHA1.hexdigest(pass)].pack("H*");
 
@@ -89,7 +87,7 @@ module Cybermut
            'url_retour_err',
            'lgue',
            'societe',
-           'texte-libre'         
+           'texte-libre'
          ]
        end
 
