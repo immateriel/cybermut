@@ -9,10 +9,21 @@ module Cybermut
     end
  
  
-    def cybermut_setup(reference,montant,tpe, options={},key=Cybermut::Confirmation.hmac_sha1_key,pass=Cybermut::Confirmation.hmac_sha1_pass)
+    def cybermut_setup(reference,montant,tpe, options={})
         misses = (options.keys - valid_cybermut_setup_options)
         raise ArgumentError, "Unknown option #{misses.inspect}" if not misses.empty?
-        
+
+        key=Cybermut::Confirmation.hmac_sha1_key
+        pass=Cybermut::Confirmation.hmac_sha1_pass
+
+        if options['key']
+          key=options['key']
+        end
+
+        if options['pass']
+          pass=options['pass']
+        end
+
         params={}
         params['texte_libre'] = ""
         params['lgue'] = "FR"
@@ -87,7 +98,9 @@ module Cybermut
            'url_retour_err',
            'lgue',
            'societe',
-           'texte-libre'
+           'texte-libre',
+           'key',
+           'pass'
          ]
        end
 
