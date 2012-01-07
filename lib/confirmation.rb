@@ -25,8 +25,6 @@ module Cybermut
        @raw = post
        for line in post.split('&')
         key, value = *line.scan( %r{^(.+)\=(.*)$} ).flatten
-#        puts "#{key} : #{CGI.unescape(value)}"
-
         if key
           params[key] = CGI.unescape(value)
         end
